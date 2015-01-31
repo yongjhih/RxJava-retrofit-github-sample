@@ -1,0 +1,48 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        //classpath 'org.reflection_no_reflection:gradle-plugin:+'
+        classpath 'me.tatarka:gradle-retrolambda:2.5.0'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'me.tatarka.retrolambda'
+
+retrolambda {
+    // ```bash
+    // export JAVA8_HOME="/usr/lib/jvm/java-8-oracle"
+    // export JAVA7_HOME="/usr/lib/jvm/java-7-oracle"
+    // export JAVA_HOME="$JAVA8_HOME"
+    // ```
+    //jvmArgs '-noverify'
+    jdk System.getenv("JAVA8_HOME")
+    //oldJdk System.getenv("JAVA_HOME")
+    oldJdk System.getenv("JAVA7_HOME")
+    javaVersion JavaVersion.VERSION_1_7
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'io.reactivex:rxjava:1.+'
+    compile 'com.squareup.retrofit:retrofit:1.9.+'
+}
+
+/*
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.github.yongjhih.Main'
+    }
+}
+*/
+
+task execute(type:JavaExec) {
+   main = mainClass
+   classpath = sourceSets.main.runtimeClasspath
+}
