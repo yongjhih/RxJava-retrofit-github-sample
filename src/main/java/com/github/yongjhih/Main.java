@@ -44,17 +44,15 @@ public class Main {
     }
 
     public static void main(String... args) {
-        String token = null;
-        if (args.length > 1) token = args[1];
-        final String finalToken = token;
-        System.out.println("token: " + finalToken);
+        String token = (args.length > 1) ? args[1] : null;
+        System.out.println("token: " + token);
         // Create a very simple REST adapter which points the GitHub API endpoint.
         RestAdapter restAdapter = new RestAdapter.Builder()
             .setEndpoint("https://api.github.com")
             .setRequestInterceptor(request -> {
-                if (finalToken != null && !"".equals(finalToken)) {
+                if (token != null && !"".equals(token)) {
                     // https://developer.github.com/v3/#authentication
-                    request.addHeader("Authorization", "token " + finalToken);
+                    request.addHeader("Authorization", "token " + token);
                 }
             })
             .build();
