@@ -61,13 +61,6 @@ public class Main {
         GitHub github = restAdapter.create(GitHub.class);
 
         // Fetch and print a list of the contributors to this library.
-        /* 0.
-        List<Contributor> contributors = github.contributors("ReactiveX", "RxJava");
-        for (Contributor contributor : contributors) {
-            System.out.println(contributor.login + "\t" + contributor.contributions);
-        }
-        */
-
         /* 1.
         github.contributors("ReactiveX", "RxJava")
             .flatMap(list -> Observable.from(list))
