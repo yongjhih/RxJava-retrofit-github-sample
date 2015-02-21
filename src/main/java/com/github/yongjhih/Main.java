@@ -55,6 +55,7 @@ public class Main {
             .setEndpoint("https://api.github.com")
             .setRequestInterceptor(request -> {
                 if (finalToken != null && !"".equals(finalToken)) {
+                    // https://developer.github.com/v3/#authentication
                     request.addHeader("Authorization", "token " + finalToken);
                 }
             })
