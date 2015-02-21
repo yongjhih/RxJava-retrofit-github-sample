@@ -21,12 +21,24 @@ public class Main {
         int contributions;
     }
 
+    static class User {
+        String name;
+    }
+
     interface GitHub {
         @GET("/repos/{owner}/{repo}/contributors")
         //List<Contributor> contributors(
         Observable<List<Contributor>> contributors(
             @Path("owner") String owner,
             @Path("repo") String repo);
+
+        @GET("/users/{user}")
+        Observable<User> user(
+            @Path("user") String user);
+
+        @GET("/users/{user}/starred")
+        Observable<List<Repo>> starred(
+            @Path("user") String user);
     }
 
     public static void main(String... args) {
@@ -45,8 +57,17 @@ public class Main {
             System.out.println(contributor.login + "\t" + contributor.contributions);
         }
         */
+
+        /*
         github.contributors("ReactiveX", "RxJava")
             .flatMap(list -> Observable.from(list))
             .forEach(c -> System.out.println(c.login + "\t" + c.contributions));
+        */
+
+        github.contributors("ReactiveX", "RxJava")
+            .flatMap(list -> Observable.from(list))
+            .flatMap(c -> github.user(c.login))
+            .filter(user -> user.name != null)
+            .forEach(user -> System.out.println(user.name));
     }
 }
