@@ -44,7 +44,7 @@ jar {
 */
 
 task execute(type:JavaExec) {
-   main = mainClass
+   main = 'com.github.yongjhih.Main'
    classpath = sourceSets.main.runtimeClasspath
    args = ["", token]
 }
