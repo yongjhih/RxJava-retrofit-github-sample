@@ -4,8 +4,6 @@ import rx.schedulers.*;
 import rx.Observable;
 import rx.functions.*;
 import rx.observables.*;
-import rx.util.*;
-import rx.internal.operators.*;
 
 import java.util.List;
 import retrofit.RestAdapter;
