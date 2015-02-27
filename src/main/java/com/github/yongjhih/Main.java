@@ -6,85 +6,52 @@ import rx.functions.*;
 import rx.observables.*;
 
 import java.util.List;
-import retrofit.RestAdapter;
-import retrofit.http.GET;
-import retrofit.http.Path;
+import java.util.ArrayList;
 
-/**
- * ref. https://github.com/square/retrofit/blob/master/samples/github-client/src/main/java/com/example/retrofit/GitHubClient.java
- */
 public class Main {
-    static class Contributor {
-        String login;
-        int contributions;
+    abstract static class AbsCallback<T> {
+        abstract void done(List<T> list);
     }
 
-    static class User {
-        String name;
+    static class CallbackUtils {
+        interface Callback<T> {
+            void done(List<T> list);
+        }
+
+        static <T> AbsCallback<T> create(Callback<T> callback) {
+            return new AbsCallback<T>() {
+                @Override public void done(List<T> list) {
+                    callback.done(list);
+                }
+            };
+        }
     }
 
-    static class Repo {
-        String full_name;
-    }
-
-    interface GitHub {
-        @GET("/repos/{owner}/{repo}/contributors")
-        //List<Contributor> contributors(
-        Observable<List<Contributor>> contributors(
-            @Path("owner") String owner,
-            @Path("repo") String repo);
-
-        @GET("/users/{user}")
-        Observable<User> user(
-            @Path("user") String user);
-
-        @GET("/users/{user}/starred")
-        Observable<List<Repo>> starred(
-            @Path("user") String user);
+    public static void test(AbsCallback<String> callback) {
+        callback.done(new ArrayList<>());
     }
 
     public static void main(String... args) {
-        String token = (args.length > 1) ? args[1] : null;
-        System.out.println("token: " + token);
-        // Create a very simple REST adapter which points the GitHub API endpoint.
-        RestAdapter restAdapter = new RestAdapter.Builder()
-            .setEndpoint("https://api.github.com")
-            .setRequestInterceptor(request -> {
-                if (token != null && !"".equals(token)) {
-                    // https://developer.github.com/v3/#authentication
-                    request.addHeader("Authorization", "token " + token);
-                }
-            })
-            .build();
-
-        // Create an instance of our GitHub API interface.
-        GitHub github = restAdapter.create(GitHub.class);
-
-        // Fetch and print a list of the contributors to this library.
-        /* 1.
-        github.contributors("ReactiveX", "RxJava")
-            .flatMap(list -> Observable.from(list))
-            .forEach(c -> System.out.println(c.login + "\t" + c.contributions));
-        */
-
-        /* 2.
-        github.contributors("ReactiveX", "RxJava")
-            .flatMap(list -> Observable.from(list))
-            .flatMap(c -> github.user(c.login))
-            .filter(user -> user.name != null)
-            .forEach(user -> System.out.println(user.name));
-        */
-
-        github.contributors("ReactiveX", "RxJava")
-            .flatMap(list -> Observable.from(list))
-            .flatMap(c -> github.starred(c.login))
-            .flatMap(list -> Observable.from(list))
-            .filter(r -> !r.full_name.startsWith("ReactiveX"))
-            .groupBy(r -> r.full_name)
-            .flatMap(g -> g.count().map(c -> c + "\t" + g.getKey()))
-            .toSortedList((a, b) -> b.compareTo(a))
-            .flatMap(list -> Observable.from(list))
-            .take(8)
-            .forEach(System.out::println);
+        test(CallbackUtils.create(list -> System.out.println(list)));
     }
+
+    /*
+        this.<String>say(hello())
+        this.<Integer>say(hello())
+    <T> T hello() {
+        return hello((T) null)
+    }
+
+    int hello(Integer selector) {
+    }
+
+    String hello(String selector) {
+    }
+
+    say(String) {
+    }
+
+    say(int) {
+    }
+    */
 }
